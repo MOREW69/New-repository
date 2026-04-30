@@ -27,7 +27,7 @@ jobs:
           mv wgcf-profile.conf wireguard.conf
 
       - name: Upload config
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wireguard
           path: wireguard.conf
