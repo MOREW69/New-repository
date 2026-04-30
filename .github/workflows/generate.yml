@@ -7,24 +7,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y wireguard-tools jq
-
-      - name: Download wgcf
-        run: |
-          wget -O wgcf https://github.com/ViRb3/wgcf/releases/latest/download/wgcf_linux_amd64
-          chmod +x wgcf
-
       - name: Register WARP account
         run: |
-          yes | ./wgcf register
+          curl -sX POST "https://api.cloudflareclient.com/v0a2408/reg" \
+            -H "User-Agent: okhttp/3.12.1" > account.json
 
-      - name: Generate config
+      - name: Generate WireGuard config
         run: |
-          ./wgcf generate
-          mv wgcf-profile.conf wireguard.conf
+          PRIVATE_KEY=$(wg genkey)
+          PUBLIC_KEY=$(echo "$PRIVATE_KEY" | wg pubkey)
+          ENDPOINT="engage.cloudflareclient.com:2408"
+          CF_PUBKEY=$(jq -r '.config.peers[0].public_key' account.json)
+          ADDR4=$(jq -r '.config.interface.addresses.v4' account.json)
+          ADDR6=$(jq -r '.config.interface.addresses.v6' account.json)
+
+          cat <<EOF > wireguard.conf
+[Interface]
+PrivateKey = $PRIVATE_KEY
+Address = $ADDR4, $ADDR6
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = $CF_PUBKEY
+Endpoint = $ENDPOINT
+AllowedIPs = 0.0.0.0/0, ::/0
+EOF
 
       - name: Upload config
         uses: actions/upload-artifact@v4
