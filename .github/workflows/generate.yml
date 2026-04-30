@@ -7,6 +7,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y wireguard-tools jq curl
+
       - name: Register WARP account
         run: |
           curl -sX POST "https://api.cloudflareclient.com/v0a2408/reg" \
