@@ -1,0 +1,33 @@
+name: Generate WARP config
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y wireguard-tools jq
+
+      - name: Download wgcf
+        run: |
+          wget -O wgcf https://github.com/ViRb3/wgcf/releases/latest/download/wgcf_amd64
+          chmod +x wgcf
+
+      - name: Register WARP account
+        run: |
+          yes | ./wgcf register
+
+      - name: Generate config
+        run: |
+          ./wgcf generate
+          mv wgcf-profile.conf wireguard.conf
+
+      - name: Upload config
+        uses: actions/upload-artifact@v3
+        with:
+          name: wireguard
+          path: wireguard.conf
