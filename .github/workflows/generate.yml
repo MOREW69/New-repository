@@ -14,7 +14,7 @@ jobs:
 
       - name: Download wgcf
         run: |
-          wget -O wgcf https://github.com/ViRb3/wgcf/releases/latest/download/wgcf_amd64
+          wget -O wgcf https://github.com/ViRb3/wgcf/releases/latest/download/wgcf_linux_amd64
           chmod +x wgcf
 
       - name: Register WARP account
